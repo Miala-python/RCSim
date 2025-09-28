@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dessin sur Canvas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-top: 10px;
+        }
+        .color-selector {
+            margin-bottom: 10px;
+        }
+        .color-option {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+            cursor: pointer;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dessin sur Canvas</h1>
+    <div class="color-selector">
+        <div class="color-option" style="background-color: #FF0000;" data-color="#FF0000"></div>
+        <div class="color-option" style="background-color: #00FF00;" data-color="#00FF00"></div>
+        <div class="color-option" style="background-color: #0000FF;" data-color="#0000FF"></div>
+        <div class="color-option" style="background-color: #FFFF00;" data-color="#FFFF00"></div>
+        <div class="color-option" style="background-color: #FF00FF;" data-color="#FF00FF"></div>
+        <div class="color-option" style="background-color: #00FFFF;" data-color="#00FFFF"></div>
+        <div class="color-option" style="background-color: #FF9900;" data-color="#FF9900"></div>
+        <div class="color-option" style="background-color: #99FF00;" data-color="#99FF00"></div>
+        <div class="color-option" style="background-color: #00FF99;" data-color="#00FF99"></div>
+        <div class="color-option" style="background-color: #9900FF;" data-color="#9900FF"></div>
+        <div class="color-option" style="background-color: #FF0099;" data-color="#FF0099"></div>
+    </div>
+    <canvas id="drawingCanvas" width="1000" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let isErasing = false;
+        let currentColor = '#FF0000'; // Couleur par défaut
+
+        // Remplir le canvas avec une couleur blanche au début
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Écouteur pour les clics sur les couleurs
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                currentColor = this.getAttribute('data-color');
+            });
+        });
+
+        // Écouteurs pour les touches du clavier
+        document.addEventListener('keydown', function(event) {
+            if (event.key.toLowerCase() === 'd') {
+                isDrawing = true;
+            } else if (event.key.toLowerCase() === 's') {
+                isErasing = true;
+            }
+        });
+
+        document.addEventListener('keyup', function(event) {
+            if (event.key.toLowerCase() === 'd') {
+                isDrawing = false;
+            } else if (event.key.toLowerCase() === 's') {
+                isErasing = false;
+            }
+        });
+
+        // Écouteurs pour la souris
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        function startDrawing(e) {
+            if (isDrawing || isErasing) {
+                draw(e);
+            }
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            isErasing = false;
+        }
+
+        function draw(e) {
+            if (!isDrawing && !isErasing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (isDrawing) {
+                ctx.fillStyle = currentColor;
+            } else if (isErasing) {
+                ctx.fillStyle = 'white';
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    </script>
+</body>
+</html>
